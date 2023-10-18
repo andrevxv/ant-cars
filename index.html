@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="./styles.css" />
+
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.3/jspdf.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>
+
+    <script type="module" src="./script.js" defer></script>
+  </head>
+  <body>
+    <div id="app" class="canvas_div_pdf">
+      <section id="header">
+        <div class="logo">
+          <img src="./assets/logo.png" alt="logotipo ant multimarcas" />
+        </div>
+        <div class="header-text"><h1>Detalhes do veículo</h1></div>
+      </section>
+      <section id="info-1">
+        <div class="brand input-wrapper">
+          <h2 class="cat">Marca / modelo / versão</h2>
+          <p class="bold" id="value-input-brand">VOLKSWAGEN GOL MPI 1.0</p>
+        </div>
+        <div class="plate input-wrapper">
+          <p class="cat">Placa</p>
+          <p class="bold" id="value-input-plate">ojw1i64</p>
+        </div>
+        <div class="year input-wrapper">
+          <p class="cat">Ano</p>
+          <p class="bold" id="value-input-year">2022/2023</p>
+        </div>
+        <div class="trasmission input-wrapper">
+          <p class="cat">Transmissão</p>
+          <p class="bold" id="value-input-transmission">MANUAL</p>
+        </div>
+        <div class="km input-wrapper">
+          <p class="cat">quilometragem</p>
+          <p class="bold" id="value-input-km">22.000 KM</p>
+        </div>
+        <div class="fuel input-wrapper">
+          <p class="cat">Combustível</p>
+          <p class="bold" id="value-input-fuel">flex</p>
+        </div>
+      </section>
+      <section id="info-2">
+        <div class="details input-wrapper">
+          <p class="cat">Descrição</p>
+          <p id="value-input-details" class="bold">
+            Externa e interna em perfeito estado. <br />
+            Veículo extremamente novo. <br />
+          </p>
+          <p id="value-input-details-2" class="cat-2 bold">
+           <br> Quilometragem baixa. <br />
+            manual e cópia de chave. <br />
+            Garantia de fábrica.
+          </p>
+        </div>
+
+        <div class="price input-wrapper">
+          <p class="cat">Preço</p>
+          <p id="value-input-price" class="bold">R$ 62.900,00</p>
+        </div>
+        <div class="stamps input-wrapper">
+          <img
+            src="./assets/veri-vistoria-black.png"
+            alt="vistoria cautelar 100% aprovada"
+          />
+        </div>
+      </section>
+
+      <section id="info-3">
+        <div class="optional input-wrapper">
+          <p class="cat">Opcionais do veículo</p>
+          <p id="value-input-optional" class="optional-value bold">
+           Air bags / ar condicionado / banco do motorista com ajuste de altura / direção elétrica / freios abs / vidros elétricos
+            <br /><br />porta malas: 285L <br />consumo: cidade: 13.3 KM/L /
+            ESTRADA: 17.3 KM/L
+          </p>
+        </div>
+        <div class="conditions input-wrapper">
+          <p class="cat">condições financeiras</p>
+          <p id="value-input-conditions" class="bold">
+            financiamento bancário em até 60x (c6, pan, safra e bv) <br />Entrada parcelada em até 18x no cartão
+            de crédito
+          </p>
+        </div>
+        <div class="comments input-wrapper">
+          <p class="cat">Observações</p>
+          <p id="value-input-comments" class="bold">
+    garantia de 3 meses pela ANT MULTIMARCAS
+          </p>
+        </div>
+      </section>
+    </div>
+
+    <div id="buttons">
+    <button id="edit">editar</button>
+    <button onclick="getPDF()" id="printPDF">gerar pdf</button>
+    <button onclick="window.print()" id="printPDF">imprimir</button>
+    </div>
+    
+    <script>
+      function getPDF() {
+        var HTML_Width = $(".canvas_div_pdf").width()
+        var HTML_Height = $(".canvas_div_pdf").height()
+        var top_left_margin = 15
+        var PDF_Width = HTML_Width + top_left_margin * 2
+        var PDF_Height = PDF_Width * 1.5 + top_left_margin * 2
+        var canvas_image_width = HTML_Width
+        var canvas_image_height = HTML_Height
+
+        var totalPDFPages = Math.ceil(HTML_Height / PDF_Height) - 1
+
+        html2canvas($(".canvas_div_pdf")[0], { allowTaint: true }).then(
+          function (canvas) {
+            canvas.getContext("2d")
+
+            console.log(canvas.height + "  " + canvas.width)
+
+            var imgData = canvas.toDataURL("image/jpeg", 1.0)
+            var pdf = new jsPDF("p", "pt", [PDF_Width, PDF_Height])
+            pdf.addImage(
+              imgData,
+              "JPG",
+              top_left_margin,
+              top_left_margin,
+              canvas_image_width,
+              canvas_image_height
+            )
+
+            for (var i = 1; i <= totalPDFPages; i++) {
+              pdf.addPage(PDF_Width, PDF_Height)
+              pdf.addImage(
+                imgData,
+                "JPG",
+                top_left_margin,
+                -(PDF_Height * i) + top_left_margin * 4,
+                canvas_image_width,
+                canvas_image_height
+              )
+            }
+
+            pdf.save("HTML-Document.pdf")
+          }
+        )
+      }
+    </script>
+  </body>
+</html>
